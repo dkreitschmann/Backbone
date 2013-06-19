@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <title></title>
+      <meta name="description" content="">
+      <script src="js/jquery-1.8.3.min.js"></script>
+  </head>
+  <body>
+    <div id="todo">
+      <ul>
+        <li><a href="#">link</a></li>
+        <li><a href="#">link</a></li>
+        <li><a href="#">link</a></li>
+        <li><a href="#">link</a></li>
+      </ul>    
+    </div>
+    <script>
+      
+      // This doesn't work like you might think, because the value of `i` never
+      // gets locked in. Instead, every link, when clicked (well after the loop
+      // has finished executing), alerts the total number of elements, because
+      // that's what the value of `i` actually is at that point.
+      
+      /*var elems = document.getElementsByTagName( 'a' );
+      
+      for ( var i = 0; i < elems.length; i++ ) {
+      
+        elems[ i ].addEventListener( 'click', function(e){
+          e.preventDefault();
+          alert( 'I am link #' + i );
+        }, 'false' );
+      
+      }*/
+      
+      // This works, because inside the IIFE, the value of `i` is locked in as
+      // `lockedInIndex`. After the loop has finished executing, even though the
+      // value of `i` is the total number of elements, inside the IIFE the value
+      // of `lockedInIndex` is whatever the value passed into it (`i`) was when
+      // the function expression was invoked, so when a link is clicked, the
+      // correct value is alerted.
+      
+      /*var elems = document.getElementsByTagName( 'a' );
+      
+      for ( var i = 0; i < elems.length; i++ ) {
+      
+        (function( lockedInIndex ){
+      
+          elems[ i ].addEventListener( 'click', function(e){
+            e.preventDefault();
+            alert( 'I am link #' + lockedInIndex );
+          }, 'false' );
+      
+        })( i );
+      
+      }*/
+      
+      // You could also use an IIFE like this, encompassing (and returning) only
+      // the click handler function, and not the entire `addEventListener`
+      // assignment. Either way, while both examples lock in the value using an
+      // IIFE, I find the previous example to be more readable.
+      
+      /*var elems = document.getElementsByTagName( 'a' );
+      
+      for ( var i = 0; i < elems.length; i++ ) {
+      
+        elems[ i ].addEventListener( 'click', (function( lockedInIndex ){
+          return function(e){
+            e.preventDefault();
+            alert( 'I am link #' + lockedInIndex );
+          };
+        })( i ), 'false' );
+      
+      }*/
+      
+      /*
+      function wrapElements(a) {
+        var result = [];
+        for (var i = 0, n = a.length; i < n; i++) {
+          result[i] = function() { return a[i]; };
+        }
+        return result;
+      }
+      var wrapped = wrapElements([10, 20, 30, 40, 50]);
+      var f = wrapped[0];
+      alert(f()); // undefined
+      
+      
+      function wrapElements(a)
+      {
+        var result = [];
+        
+        for (var i = 0, n = a.length; i < n; i++)
+        {
+          (function(j) {
+            result[i] = function() { return a[j]; };
+          })(i);
+        }
+        return result;
+      }
+        
+      var wrapped = wrapElements([10, 20, 30, 40, 50]);
+      var f = wrapped[0];
+      alert(f()); // undefined
+      
+      */
+      function f() { return "global"; }
+      
+      function test(x) 
+      {
+        var result = [];
+        
+        if (x) {
+          function f() { return "local"; }
+          result.push(f());
+        }
+        
+        result.push(f());
+        return result;
+      }
+      
+      alert(test(true)); // ["local", "local"]
+      alert(test(false)); // ["local"]
+        
+    </script>
+    
+</body>
+</html>
